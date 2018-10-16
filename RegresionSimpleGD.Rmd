@@ -1,0 +1,137 @@
+---
+title: "Regresion Lineal Simple"
+output: github_document
+---
+
+### Cuaderno #2 
+
+*Regresion Lineal Simple con Descenso de Gradiente*.
+
+Este cuaderno pertenece al libro de Fundamentos de Machine Learning. 
+
+### Licencia
+
+Copyright 2018 Nerdyne A.I / Fundamentos de Machine Learning.
+
+Se concede permiso por la presente, libre de cargos, a cualquier persona que obtenga una copia de este software y de los archivos de documentación asociados (el "Software"), a utilizar el Software sin restricción, incluyendo sin limitación los derechos a usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar, y/o vender copias del Software, y a permitir a las personas a las que se les proporcione el Software a hacer lo mismo, sujeto a las siguientes condiciones:
+
+El aviso de copyright anterior y este aviso de permiso se incluirán en todas las copias o partes sustanciales del Software.
+
+EL SOFTWARE SE PROPORCIONA "COMO ESTÁ", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE COMERCIALIZACIÓN, IDONEIDAD PARA UN PROPÓSITO PARTICULAR E INCUMPLIMIENTO. EN NINGÚN CASO LOS AUTORES O PROPIETARIOS DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES DE NINGUNA RECLAMACIÓN, DAÑOS U OTRAS RESPONSABILIDADES, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O CUALQUIER OTRO MOTIVO, DERIVADAS DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O SU USO U OTRO TIPO DE ACCIONES EN EL SOFTWARE.
+
+
+### Cargar Datos del Set de Entrenamiento
+```{r}
+datos <- read.csv('datasets/LR_1.csv')
+datos$X
+```
+
+### Desplegar la Relacion de Variables XY
+```{r}
+plot(datos$X, datos$y, pch = 19, col = "purple")
+```
+
+
+### Modelo Lineal
+```{r}
+modeloLineal <- function(x, b_0, b_1){
+  return (b_0 + (b_1 * x))
+}
+```
+
+
+### Estimacion b0 & b1 con Descenso de Gradiente
+
+#### Funcion del Costo del Gradiente
+```{r}
+costo <- function(b_0, b_1, x){
+  yi <- modeloLineal(datos$X, b_0, b_1)
+  y <- datos$y
+  m <- nrow(datos)
+  costo_actual <- (1/m) * sum((yi - y) * x)
+  return (costo_actual)
+}
+```
+
+
+#### Ejecucion del Gradiente
+```{r}
+alpha = 0.001
+epochs = 1000
+b0 <- 1
+b1 <- 1
+
+for (e in 1:epochs) {
+  
+  c <- costo(b0,b1,1)
+  
+  c1 <- sum(costo(b0,b1,datos$X)) 
+  
+  if (c > 0){  
+    t_0 <- b0 - alpha * c
+  }
+  
+  if (c1 > 0){
+    t_1 <- b1 - alpha * c1
+  }
+    
+  b0 <- t_0
+  b1 <- t_1
+  
+  if (c < 0 && c1 < 0)
+  {
+    # Convergencia
+    break;
+  }
+  
+  # print(paste0('costo:', c, ' c1:',c1, ' b0:' , b0, ' b1:', b1))
+}
+
+print(paste0('b0:' , b0, ' b1:', b1, ' epoch:', e))
+
+```
+
+
+
+### Despliegue de Modelo "Debidamente" Ajustado
+
+```{r}
+
+plot(datos$X, datos$y, pch = 21, col = "purple")
+title(main = "Regresion Lineal Simple + Descenso de Gradiente")
+lines(datos$X, modeloLineal(datos$X, b0, b1), type="l", lty=1, col = "red")
+lines(datos$X, modeloLineal(datos$X, -0.15, 0.99), type="l", lty=1, col = "black")
+legend('bottomright', c('Simple', 'Simple + GD') , 
+   lty=1, col=c('black', 'red'), bty='n')
+
+```
+
+### Estimacion del Error Residual
+
+```{r}
+
+yp <- modeloLineal(datos$X, b0, b1)
+yi <- datos$y
+
+error <- sqrt( sum((yi-yp)^2) / length(yi))
+
+print(error)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
